@@ -34,7 +34,8 @@ exports.signUp = async(req, res)=>{
         const data = new userModel({
             userName,
             email: email.toLowerCase().trim(),
-            password: hash
+            password: hash,
+            picture: image.secure_url
         })
         await data.save()
         res.status(200).json({
