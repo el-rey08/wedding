@@ -37,6 +37,20 @@ exports.signUp = async(req, res)=>{
             password: hash,
             picture: image.secure_url
         })
+
+        fs.unlink(file.path, (error) => {
+            if (error) {
+              console.error("Error deleting the file from local storage:", error);
+            } else {
+              console.log("File deleted from local storage");
+            }
+          });
+
+          const userToken = jwt.sign(
+            { id: data._id, email: data.email },
+            process.env.JWT_SECRET,
+            { expiresIn: "24h" }
+          );
         await data.save()
         res.status(200).json({
             message: 'usere created successfully',
@@ -47,4 +61,33 @@ exports.signUp = async(req, res)=>{
             message: error.message
         })
     }
+}
+
+exports.login = async (req, res) => {
+try {
+    const{email, password}=req.body
+    const existingUser = await userModel.findOne({email: email.toLowerCase().trim()})
+    if(!existingUser){
+        return res.status(404).json({
+            message: 'user does not exist'
+        })
+    }
+    const checkPassword = await bcrypt.compare(password , existingUser.password)
+    if(!checkPassword){
+        return res.status(400).json({
+            message: 'please input correct password'
+        })
+    }
+    const userToken = jwt.sign({
+        userId: existingUser._id,
+        email: existingUser.email
+    },
+    process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+)
+} catch (error) {
+    res.status(500).json({
+        message : error.message
+    })
+}    
 }
