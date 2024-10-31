@@ -1,5 +1,5 @@
 // Using Cloudinary example
-const cloudinary = require('../config/dbConfig');
+const cloudinary = require('./cloudinary');
 const QRCode = require('qrcode');
 
 const generateQRCode = async (url) => {
