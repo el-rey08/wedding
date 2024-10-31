@@ -14,3 +14,5 @@ router.post('/login', login)
 router.post('/create-event', createEvent)
 
 router.post('/upload', validateFileUpload, uploadFile)
+
+module.exports = router

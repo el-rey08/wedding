@@ -1,5 +1,6 @@
 const express=require("express")
 const fileUpload = require("express-fileupload");
+const router = require('../router/routes')
 
 const env=require("dotenv").config()
 const db=require("./config/dbConfig")
@@ -10,6 +11,8 @@ app.use(express.json())
 app.use(fileUpload({
     useTempFiles: true
   }));
+
+app.use(router)
   
 app.use(cors());
 
@@ -18,8 +21,8 @@ app.get("/",(req,res)=>{
 })
 
 
-app.listen(1234,()=>{
-    console.log(`app is successfully listening to port http://localhost ${port} `);
+app.listen(port,()=>{
+    console.log(`app is successfully listening to port http://localhost:${port} `);
     
 })
 
