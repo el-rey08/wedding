@@ -11,8 +11,12 @@ exports.signUp = async(req, res)=>{
         }=req.body
         if(!userName || !email || !password){
             return res.status(400).json({
-                message:"please "
+                message:"please input the missing field(s) "
             })
+        }
+        const existingUser = await userModel.findOne({email: email.toLowerCase().trim()})
+        if(existingUser){
+            return
         }
     } catch (error) {
         res.status(500).json({
