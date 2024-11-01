@@ -1,4 +1,4 @@
-const { Event } = require('./models/eventModel');
+const Event = require('../models/eventModel');
 const generateQRCode = require('../utils/qrcode');
 const crypto = require('crypto');
 
