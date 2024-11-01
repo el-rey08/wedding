@@ -1,11 +1,22 @@
 const Event = require('../models/eventModel');
 const generateQRCode = require('../utils/qrcode');
 const crypto = require('crypto');
+const {validateEventTimes} = require('../utils/functions')
 
   exports.createEvent = async(req,res) => {
     try {
 
-        const {name,description,date,startTime,endTime} = req.body
+      const {name,description,startDate, endDate, startTime,endTime} = req.body
+
+      const validateDateInputs = await validateEventTimes(startDate, endDate, startTime, endTime)
+      if (!validateDateInputs.isValid) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid event times',
+          errors: validation.errors
+        });
+      }
+
       // Generate unique access token
       const accessToken = crypto.randomBytes(32).toString('hex');
       
@@ -19,7 +30,8 @@ const crypto = require('crypto');
       const event = new Event({
         name,
         description,
-        date,
+        startDate,
+        endDate,
         startTime,
         endTime,
         accessToken,

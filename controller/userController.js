@@ -1,7 +1,8 @@
 const express = require('express')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-const cloudinary = require('../utils/cloudinary')
+const cloudinary = require('../config/cloudinary')
+const userModel = require('../models/userModel')
 
 exports.signUp = async(req, res)=>{
     try {
@@ -53,8 +54,9 @@ exports.signUp = async(req, res)=>{
           );
         await data.save()
         res.status(200).json({
-            message: 'usere created successfully',
-            data
+            message: 'user created successfully',
+            data,
+            token:userToken
         })
     } catch (error) {
         res.status(500).json({
@@ -85,6 +87,12 @@ try {
     process.env.JWT_SECRET,
       { expiresIn: "1d" }
 )
+
+res.status(200).json({
+    message: 'login successfully',
+    data: existingUser,
+    token:userToken
+})
 } catch (error) {
     res.status(500).json({
         message : error.message

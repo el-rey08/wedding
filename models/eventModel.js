@@ -10,16 +10,20 @@ const EventSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
-  date: {
-    type: Date,
+  startDate: {
+    type: String,
+    required: true
+  },
+  endDate: {
+    type: String,
     required: true
   },
   startTime: {
-    type: Date,
+    type: String,
     required: true
   },
   endTime: {
-    type: Date,
+    type: String,
     required: true
   },
   qrCode: {

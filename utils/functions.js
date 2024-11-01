@@ -1,5 +1,6 @@
-const moment = require('moment');
+// const { isWithinInterval, subHours } = require('date-fns');
 const ExifReader = require('exifreader');
+const fs = require('fs')
 
 const extractFileMetadata = async (file) => {
     const metadata = {
@@ -12,7 +13,7 @@ const extractFileMetadata = async (file) => {
     try {
       // Extract EXIF data for images
       if (file.mimetype.startsWith('image/')) {
-        const buffer = require('fs').readFileSync(file.path);
+        const buffer = fs.readFileSync(file.path);
         const tags = ExifReader.load(buffer);
 
         // Try to get original creation date from EXIF
@@ -28,19 +29,45 @@ const extractFileMetadata = async (file) => {
     }
   }
 
-  // Check if file was created during the event time
-  const isFileCreatedDuringEvent = (fileCreatedAt, event) => {
-    const createdMoment = moment(fileCreatedAt);
-    const eventStartMoment = moment(event.startTime);
-    const eventEndMoment = moment(event.endTime);
+//   // Check if file was created during the event time
+//   const isFileCreatedDuringEvent = (fileCreatedAt, event) => {
+//     const createdTime = new Date(fileCreatedAt);
+//     const eventStart = new Date(event.startTime);
+//     const eventEnd = new Date(event.endTime);
+    
+//     return isWithinInterval(createdTime, {
+//         start: subHours(eventStart, 1), // 1-hour buffer
+//         end: eventEnd
+//     });
+// } 
 
-    // Allow a small buffer (e.g., 1 hour before event start)
-    const bufferBefore = eventStartMoment.clone().subtract(1, 'hours');
-
-    return createdMoment.isBetween(bufferBefore, eventEndMoment);
-  }
+  const validateEventTimes = (startDate, endDate, startTime, endTime) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const startTimeObj = new Date(`${startDate}T${startTime}`);
+    const endTimeObj = new Date(`${endDate}T${endTime}`);
+  
+    const validations = {
+      isValid: true,
+      errors: []
+    };
+  
+    // Check if end date is not before start date
+    if (end < start) {
+      validations.isValid = false;
+      validations.errors.push('End date cannot be before start date');
+    }
+  
+    // Check if end time is not before start time on the same day
+    if (startDate === endDate && endTimeObj < startTimeObj) {
+      validations.isValid = false;
+      validations.errors.push('End time cannot be before start time on the same day');
+    }
+  
+    return validations;
+  };
 
   module.exports = {
-    isFileCreatedDuringEvent,
-    extractFileMetadata
+    extractFileMetadata,
+    validateEventTimes,
   }
